@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Loader } from '../Loader';
 import '../../styles/main.scss';
 import { GeneratedImage } from '../GeneratedImage';
@@ -7,13 +7,13 @@ export const FormForImage = () => {
   const [prompt, setPrompt] = useState('');
   const [size, setSize] = useState('small');
   const [isLoading, setIsLoading] = useState(false);
-  const generatedImageRef = useRef<any>(null);
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [image, setImage] = useState('');
 
   const BASE_URL = 'https://openai-be.onrender.com/openai/generateimage';
 
   const generateImageRequest = async (prompt: string, size: string) => {
     setIsLoading(true);
+    setImage('');
 
     try {
       const response = await fetch(BASE_URL, {
@@ -36,12 +36,10 @@ export const FormForImage = () => {
 
       setIsLoading(false);
 
-      generatedImageRef.current.src = imageUrl;
-      setIsImageLoaded(true);
-
-    } catch (error) {
+      setImage(imageUrl);
+    } catch (error: any) {
       setIsLoading(false);
-      throw new Error('Something went wrong');
+      throw new Error(error.message);
     }
   };
 
@@ -108,16 +106,18 @@ export const FormForImage = () => {
 
       {isLoading && <Loader/>}
 
+      {image &&
       <div>
         <img
           className="max-w-lg h-auto rounded-lg"
-          ref={generatedImageRef}
+          src={image}
           alt="generated image"
         />
-      </div>
+      </div>}
+
+
 
       {/*{imageLoaded && <GeneratedImage generatedImageRef={generatedImageRef}/>}*/}
-
     </>
   )
 }
